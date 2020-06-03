@@ -1,0 +1,47 @@
+<%- include('./includes/head.ejs') %>
+<link rel="stylesheet" href="/css/product.css">
+</head>
+
+<body>
+<%- include('./includes/navigation.ejs') %>
+
+
+<form class="product-form" action="/dict" method="POST">
+    <div class="form-control">
+        <label for="word">New Word</label>
+        <br>
+        <input id="word" name="newWord" type="text" autofocus>
+    </div>
+    <br>
+    <div class="form-control">
+        <button class="btn" type="submit">Save</button>
+    </div>
+</form>
+<% if (words.length > 0) { %>
+    <div class="centered">
+        <ol>
+            <% for (let i = 0; i < words.length; i++) { %>
+                <li><%= words[i] %>
+                    <form action="/dict/remove" method="POST">
+                        <input type="hidden" name="index" value="<%= i %>">
+                        <button type="submit">Remove</button>
+                    </form>
+                </li>
+            <% } %>
+        </ol>
+    </div>
+<% } %>
+
+<div class="centered">
+    <form action="/dict/clear" method="POST">
+        <button class="btn" type="submit">Clear</button>
+    </form>
+</div>
+
+<div class="centered">
+    <form action="/dict/submit" method="POST">
+        <button class="btn" type="submit">Submit Model</button>
+    </form>
+</div>
+
+<%- include('./includes/end.ejs') %>

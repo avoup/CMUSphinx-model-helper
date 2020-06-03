@@ -1,0 +1,104 @@
+<%- include('./includes/head.ejs') %>
+<link rel="stylesheet" href="/css/product.css">
+</head>
+
+<body>
+<%- include('./includes/navigation.ejs') %>
+
+<div class="grid-container <%= isRecording ? 'recording' : '' %>">
+
+    <div class="grid-item">
+        <h2>Transcripts</h2>
+        <form class="product-form" action="/list/add" method="POST">
+            <div class="form-control">
+                <input id="word" name="sentence" type="text" autofocus>
+<!--                <input id="word" name="appendix" type="text" value="სართულზე ჩამიყვანე">-->
+            </div>
+            <div class="form-control">
+                <button type="submit">Save</button>
+            </div>
+        </form>
+        <% if (list.length > 0) { %>
+        <ol reversed>
+            <% for (let i = si; i < list.length; i++) { %>
+            <li>
+                <%= list[i] %>
+                <form action="/list/remove" method="POST">
+                    <input type="hidden" name="index" value="<%= i %>">
+                    <button type="submit">RM</button>
+                </form>
+            </li>
+            <% } %>
+        </ol>
+        <% } %>
+
+    </div>
+
+    <div class="grid-item">
+        <form class="product-form" action="/audio?<%= testing ? 'testing=1' : '' %><%= si ? '&si=' + si : ''%>" method="POST">
+            <div class="form-control">
+                <label for="sentence">Line</label>
+                <input id="sentence" name="sentence" type="text" value="<%= [...list][si] %>" autofocus>
+            </div>
+            <div class="form-control">
+                <label for="dir">Dir</label>
+                <input id="dir" name="directory" value="<%= directory %>" type="text">
+            </div>
+            <br>
+            <div class="form-control">
+                <div class="<%= isRecording ? 'hidden' : '' %>">
+                    <button class="btn" type="submit">Record</button>
+                </div>
+                <div class="<%= isRecording ? '' : 'hidden' %>">
+                    <a class="btn <%= isRecording ? 'recording' : '' %>"
+                       href="audio/stop-recording?<%= directory ? 'directory=' + directory : ''%><%= testing ? '&testing=1' : '' %><%= si ? '&si=' + (+si+1) : ''%>">Stop
+                        </a>
+                </div>
+            </div>
+        </form>
+        <h4 class="record-line"><%= [...list][si] %></h4>
+
+    </div>
+
+    <div class="grid-item">
+        <h2>Recorded</h2>
+        <% if (transcripts.length > 0) { %>
+            <ol class="centered" reversed>
+                <% [...transcripts].reverse().forEach((val, i) => { %>
+                    <% if (!directory || [...fileIds].reverse()[i].split('/')[2] === directory) { %>
+                    <li>
+                        <%= val.substring(3, val.indexOf('</s>')) %>
+                        <form action="/audio/listen<%= testing ? '?testing=1' : '' %>" method="POST">
+                            <button name="file"
+                                    value="<%= [...fileIds].reverse()[i].split('/').splice(2, 2).join('/') %>"
+                                    type="submit">Listen
+                            </button>
+                        </form>
+                        <form action="/audio/remove<%= testing ? '?testing=1' : '' %>" method="POST">
+                            <input type="hidden" name="index" value="<%= i %>">
+
+                            <button name="file"
+                                    value="<%= [...fileIds].reverse()[i].split('/').splice(2, 2).join('/') %>"
+                                    type="submit">RM
+                            </button>
+                        </form>
+                    </li>
+                    <% } %>
+                <% }) %>
+            </ol>
+
+        <% } %>
+
+
+        <div>
+            <form action="audio/clear" method="POST">
+                <button type="submit">Clear All</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+
+<%- include('./includes/end.ejs') %>
